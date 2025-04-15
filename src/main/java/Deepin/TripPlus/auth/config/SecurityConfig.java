@@ -48,6 +48,12 @@ public class SecurityConfig {
         http
                 .httpBasic((auth)->auth.disable());
         http
+                .oauth2Login(oauth2 -> oauth2
+                        .defaultSuccessUrl("/auth/oauth2/success", true)  // 로그인 성공 후 리다이렉트 URL
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService())  // 커스텀 OAuth2UserService 설정
+                        )
+                )
                 .authorizeHttpRequests((auth)-> auth
                         .requestMatchers(
                                 "/auth/**", "/login",  // 너가 원래 열어둔 경로
