@@ -50,4 +50,11 @@ public class Course {
     @Column(name = "RATED")
     private boolean rated;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ID")
+    private User user;
+
+
+
+
 }

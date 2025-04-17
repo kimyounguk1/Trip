@@ -7,7 +7,9 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Table(name = "USER")
 @Entity
@@ -51,6 +53,10 @@ public class User {
     @Column(name = "CREATE_DATE")
     @CreatedDate
     private LocalDateTime createdDate;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
+    private List<Course> courses = new ArrayList<>();
+
 
 
 
