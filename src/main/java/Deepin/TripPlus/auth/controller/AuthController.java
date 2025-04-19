@@ -1,33 +1,57 @@
 package Deepin.TripPlus.auth.controller;
 
-import Deepin.TripPlus.auth.dto.LoginDto;
-import Deepin.TripPlus.auth.service.LoginService;
+import Deepin.TripPlus.CommenDto.ApiResponse;
+import Deepin.TripPlus.auth.dto.CourseDto;
+import Deepin.TripPlus.auth.dto.HomeDto;
+import Deepin.TripPlus.auth.dto.OnboardingDto;
+import Deepin.TripPlus.auth.dto.RegisterDto;
+import Deepin.TripPlus.auth.service.AuthService;
+import Deepin.TripPlus.auth.service.AuthServiceImpl;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final LoginService loginService;
+    private final AuthService authService;
 
     @PostMapping("/register")
-    public String registerProcess(@ModelAttribute LoginDto loginDto) {
+    public ResponseEntity<ApiResponse<?>> registerProcess(@ModelAttribute RegisterDto registerDto) {
 
-        loginService.joinProcess(loginDto);
+        authService.registerProcess(registerDto);
 
-        return "ok";
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
-    @GetMapping("/logout")
-    public String logoutProcess(){
-        return "logout Process";
+    @PostMapping("/onboarding")
+    public ResponseEntity<ApiResponse<?>> onboardingProcess(@ModelAttribute OnboardingDto onboardingDto, HttpServletRequest request) {
+
+        authService.onboardingProcess(onboardingDto, request);
+
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    @GetMapping("/logout") //프론트에서 header의 authentication을 삭제
+    public ResponseEntity<ApiResponse<?>> logoutProcess(HttpServletRequest request) {
+        String authorization = request.getHeader("Authorization");
+        if(authorization == null) {
+            return ResponseEntity.ok(ApiResponse.success(null));
+        }else {
+            return ResponseEntity.status(404).body(ApiResponse.error(404,"Logout Failed"));
+        }
     }
 
     @GetMapping("/home")
-    public String homePage(){
-        return "home";
+    public ResponseEntity<ApiResponse<?>> homePage(HttpServletRequest request){
+        HomeDto homeDto = authService.homeProcess(request);
+
+        return ResponseEntity.ok(ApiResponse.success(homeDto));
     }
 
 }

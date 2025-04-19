@@ -3,14 +3,11 @@ package Deepin.TripPlus.auth.service;
 import Deepin.TripPlus.auth.dto.AuthTokens;
 import Deepin.TripPlus.auth.dto.LoginResponse;
 import Deepin.TripPlus.auth.jwt.JWTUtil;
-import Deepin.TripPlus.auth.repository.SpringDataJpaUserRepository;
+import Deepin.TripPlus.repository.SpringDataJpaUserRepository;
 import Deepin.TripPlus.entity.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nimbusds.jose.shaded.gson.JsonElement;
-import com.nimbusds.jose.shaded.gson.JsonObject;
-import com.nimbusds.jose.shaded.gson.JsonParser;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -25,15 +22,9 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
 import java.lang.RuntimeException;
 
 import java.util.HashMap;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
