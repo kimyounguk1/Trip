@@ -39,5 +39,10 @@ public class Inquire {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime answeredDate;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ID")
+    private User user;
+
+
 
 }

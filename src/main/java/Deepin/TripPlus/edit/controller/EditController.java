@@ -1,39 +1,72 @@
 package Deepin.TripPlus.edit.controller;
 
+import Deepin.TripPlus.CommenDto.ApiResponse;
+import Deepin.TripPlus.edit.dto.InquireDto;
+import Deepin.TripPlus.edit.dto.NoticeDtDto;
+import Deepin.TripPlus.edit.dto.NoticeDto;
+import Deepin.TripPlus.edit.dto.SubmitDto;
+import Deepin.TripPlus.edit.service.EditService;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/edit")
+@RequiredArgsConstructor
 public class EditController {
 
+    private final EditService editService;
+
     @GetMapping("/notice")
-    public String noticePage(){
-        return "notice Page";
+    public ResponseEntity<ApiResponse<?>> noticePage(){
+
+        List<NoticeDto> notice = editService.noticeProcess();
+
+        return ResponseEntity.ok(ApiResponse.success(notice));
     }
 
     @GetMapping("/notice/{noticeId}")
-    public String noticePage(@PathVariable("noticeId") int noticeId){
-        return "noticeId Page";
+    public ResponseEntity<ApiResponse<?>> noticeDtPage(@PathVariable("noticeId") Long noticeId){
+
+        NoticeDtDto noticeDtDto = editService.noticeDtProcess(noticeId);
+
+        return ResponseEntity.ok(ApiResponse.success(noticeDtDto));
     }
 
     @GetMapping("/inquire")
-    public String inquirePage(){
-        return "inquire Page";
+    public ResponseEntity<ApiResponse<?>> inquirePage(HttpServletRequest request){
+
+        List<InquireDto> inquireDtos = editService.inquireProcess(request);
+
+        return ResponseEntity.ok(ApiResponse.success(inquireDtos));
     }
 
     @PostMapping("/inquire/submit")
-    public String inquireSubmitProcess(){
-        return "inquire Submit Process";
+    public ResponseEntity<ApiResponse<?>> inquireSubmitProcess(HttpServletRequest request, @RequestBody SubmitDto submitDto){
+
+        editService.inquireSubmitProcess(request, submitDto);
+
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @PutMapping("/modifyUser")
-    public String modifyUserProcess(){
-        return "modify User Process";
+    public ResponseEntity<ApiResponse<?>> modifyUserProcess(HttpServletRequest request, @RequestParam("userTripType") String userTripType){
+
+        editService.modifyUserProcess(request, userTripType);
+
+        return ResponseEntity.ok(ApiResponse.success(null));
+
     }
 
     @DeleteMapping("/delete")
-    public String AccountDeleteProcess(){
-        return "delete Account Process";
+    public ResponseEntity<ApiResponse<?>> AccountDeleteProcess(HttpServletRequest request){
+
+        editService.accountDeleteProcess(request);
+
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
 }

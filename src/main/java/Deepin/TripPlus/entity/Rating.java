@@ -25,4 +25,15 @@ public class Rating {
     @Column(name = "CREATE_DATE")
     @CreatedDate
     private LocalDateTime createdDate;
+
+    @Column(name = "MODEL_NAME")
+    private String modelName;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "course_id")
+    private Course course;
 }
