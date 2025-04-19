@@ -55,7 +55,7 @@ public class SecurityConfig {
                                 "/swagger-ui/**",      // Swagger UI 리소스 경로
                                 "/swagger-ui.html"     // Swagger HTML 진입점
                         ).permitAll()
-                        .requestMatchers("/home", "/course/**", "/edit/**", "/rating", "/courseDt").hasRole("CLIENT")
+                        .requestMatchers("/home", "/course/**", "/edit/**", "/rating", "/courseDt").hasAnyRole("CLIENT", "ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated());
         http
