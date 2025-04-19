@@ -1,7 +1,9 @@
 package Deepin.TripPlus.auth.service;
 
+import Deepin.TripPlus.Exception.CustomException;
+import Deepin.TripPlus.Exception.ErrorCode;
 import Deepin.TripPlus.auth.dto.CustomUserDetails;
-import Deepin.TripPlus.auth.repository.SpringDataJpaUserRepository;
+import Deepin.TripPlus.repository.SpringDataJpaUserRepository;
 
 import Deepin.TripPlus.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByEmail(email);
         log.info("찾은 user = {}", user);
         if (user == null) {
-            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
+            throw new CustomException(ErrorCode.NON_EXIST_USER);
         }
         return new CustomUserDetails(user);
     }
