@@ -40,4 +40,8 @@ public class CourseDetail {
     @Column(name = "SEQUENCE")
     private int sequence;
 
+    @OneToOne
+    @JoinColumn(name = "course_id")
+    private Course course;
+
 }

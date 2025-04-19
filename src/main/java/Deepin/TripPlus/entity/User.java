@@ -25,7 +25,7 @@ public class User {
     @Column(name = "NAME")
     private String name;
 
-    @Column(name = "EMAIL")
+    @Column(name = "EMAIL", unique = true)
     private String email;
 
     @Column(name = "PASSWORD")
@@ -56,6 +56,27 @@ public class User {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
     private List<Course> courses = new ArrayList<>();
+
+    public void addCourse(Course course) {
+        courses.add(course);
+        course.setUser(this);
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
+    private List<Inquire> inquires = new ArrayList<>();
+
+    public void addInquire(Inquire inquire) {
+        inquires.add(inquire);
+        inquire.setUser(this);
+    }
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Rating> ratings = new ArrayList<>();
+
+    public void addRating(Rating rating) {
+        ratings.add(rating);
+        rating.setUser(this);
+    }
 
 
 

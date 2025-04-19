@@ -7,7 +7,9 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Table(name = "COURSE")
 @Entity
@@ -50,11 +52,31 @@ public class Course {
     @Column(name = "RATED")
     private boolean rated;
 
+    @Column(name = "MODEL_NAME")
+    private String modelName;
+
+    @Column(name = "MODEL_TYPE")
+    private String modelType;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
     private User user;
 
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Rating> ratings = new ArrayList<>();
 
+    public void addRating(Rating rating) {
+        ratings.add(rating);
+        rating.setCourse(this);
+    }
+
+    @OneToOne(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    private CourseDetail courseDt;
+
+    public void setCourseDt(CourseDetail courseDt) {
+        this.courseDt = courseDt;
+        courseDt.setCourse(this);
+    }
 
 
 }
