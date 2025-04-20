@@ -1,4 +1,4 @@
-package Deepin.TripPlus.Exception;
+package Deepin.TripPlus.exception;
 
 import lombok.Getter;
 

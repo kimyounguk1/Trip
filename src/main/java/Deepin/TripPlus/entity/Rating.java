@@ -20,7 +20,7 @@ public class Rating {
     private Long id;
 
     @Column(name = "SCORE")
-    private int score;
+    private Double score;
 
     @Column(name = "CREATE_DATE")
     @CreatedDate

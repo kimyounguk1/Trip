@@ -65,7 +65,7 @@ public class Course {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Rating> ratings = new ArrayList<>();
 
-    public void addRating(Rating rating) {
+    public void addRating(Rating rating){
         ratings.add(rating);
         rating.setCourse(this);
     }
@@ -73,10 +73,9 @@ public class Course {
     @OneToOne(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private CourseDetail courseDt;
 
-    public void setCourseDt(CourseDetail courseDt) {
+    public void addCourseDt(CourseDetail courseDt) {
         this.courseDt = courseDt;
         courseDt.setCourse(this);
     }
-
 
 }

@@ -34,7 +34,7 @@ public class Model {
 
     @Column(name = "APPLY_DATE")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date applyDate;
+    private LocalDateTime applyDate;
 
     @Column(name = "CREATE_DATE")
     @CreatedDate

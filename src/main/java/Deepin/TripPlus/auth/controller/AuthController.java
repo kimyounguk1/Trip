@@ -1,18 +1,14 @@
 package Deepin.TripPlus.auth.controller;
 
-import Deepin.TripPlus.CommenDto.ApiResponse;
-import Deepin.TripPlus.auth.dto.CourseDto;
+import Deepin.TripPlus.commenDto.ApiResponse;
 import Deepin.TripPlus.auth.dto.HomeDto;
 import Deepin.TripPlus.auth.dto.OnboardingDto;
 import Deepin.TripPlus.auth.dto.RegisterDto;
 import Deepin.TripPlus.auth.service.AuthService;
-import Deepin.TripPlus.auth.service.AuthServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/auth")

@@ -1,4 +1,4 @@
-package Deepin.TripPlus.Exception;
+package Deepin.TripPlus.exception;
 
 import lombok.Getter;
 
@@ -9,7 +9,8 @@ public enum ErrorCode {
     EXPIRED_TOKEN(401, "E002", "토큰이 만료되었습니다."),
     NON_EXIST_USER(402, "E003", "존재하지 않는 유저입니다."),
     //SUSPENDED_ACCOUNT(403, "E004", "정지된 계정입니다.");
-    NON_EXIST_NOTICE(405, "E005", "존재하지 않는 공지입니다.");
+    NON_EXIST_NOTICE(405, "E005", "존재하지 않는 공지입니다."),
+    NON_EXIST_COURSE(406, "E006", "존재하지 않는 코스입니다.");
 
     private final int status;
     private final String code;

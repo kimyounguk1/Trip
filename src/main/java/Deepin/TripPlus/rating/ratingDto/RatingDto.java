@@ -1,21 +1,16 @@
-package Deepin.TripPlus.edit.dto;
-
+package Deepin.TripPlus.rating.ratingDto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter @Setter
-public class SubmitDto {
+public class RatingDto {
 
     @NotBlank(message = "필수로 입력해야 합니다.")
-    private String title;
+    private Long courseId;
 
     @NotBlank(message = "필수로 입력해야 합니다.")
-    private String content;
+    private Double score;
 
 }

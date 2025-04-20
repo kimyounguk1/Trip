@@ -1,7 +1,7 @@
 package Deepin.TripPlus.edit.service;
 
-import Deepin.TripPlus.Exception.CustomException;
-import Deepin.TripPlus.Exception.ErrorCode;
+import Deepin.TripPlus.exception.CustomException;
+import Deepin.TripPlus.exception.ErrorCode;
 import Deepin.TripPlus.auth.jwt.JWTUtil;
 import Deepin.TripPlus.edit.dto.InquireDto;
 import Deepin.TripPlus.edit.dto.NoticeDtDto;
@@ -10,6 +10,7 @@ import Deepin.TripPlus.edit.dto.SubmitDto;
 import Deepin.TripPlus.entity.Inquire;
 import Deepin.TripPlus.entity.Notice;
 import Deepin.TripPlus.entity.User;
+import Deepin.TripPlus.repository.SpringDataJpaInquireRepository;
 import Deepin.TripPlus.repository.SpringDataJpaNoticeRepository;
 import Deepin.TripPlus.repository.SpringDataJpaUserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +29,7 @@ public class EditServiceImpl implements EditService {
 
     private final SpringDataJpaNoticeRepository editRepository;
     private final SpringDataJpaUserRepository userRepository;
+    private final SpringDataJpaInquireRepository inquireRepository;
     private final JWTUtil jwtUtil;
 
     @Override
@@ -99,6 +100,8 @@ public class EditServiceImpl implements EditService {
         inquire.setAnswered(false);
 
         user.addInquire(inquire);
+
+        inquireRepository.save(inquire);
 
         return user;
 

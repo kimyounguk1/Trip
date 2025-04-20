@@ -1,12 +1,23 @@
 package Deepin.TripPlus.admin.controller;
 
+import Deepin.TripPlus.admin.service.AdminService;
+import Deepin.TripPlus.commenDto.ApiResponse;
+import Deepin.TripPlus.entity.CourseDetail;
+import Deepin.TripPlus.entity.Inquire;
+import Deepin.TripPlus.entity.User;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
-@ResponseBody
+import java.util.List;
+
+@RequiredArgsConstructor
+@RestController
 @RequestMapping("/admin")
 public class AdminController {
+
+    private final AdminService adminService;
 
     @GetMapping("/dashboard")
     public String dashboard(){
@@ -14,18 +25,27 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public String usersPage(){
-        return "usersPage";
+    public ResponseEntity<ApiResponse<?>> usersPage(){
+
+        List<User> users = adminService.UsersProcess();
+
+        return ResponseEntity.ok(ApiResponse.success(users));
     }
 
     @GetMapping("/courseDetails")
-    public String courseDetailsPage(){
-        return "courseDetailsPage";
+    public ResponseEntity<ApiResponse<?>> courseDetailsPage(){
+
+        List<CourseDetail> courseDetails = adminService.CourseDetailsProcess();
+
+        return ResponseEntity.ok(ApiResponse.success(courseDetails));
     }
 
     @GetMapping("/inquires")
-    public String inquiresPage(){
-        return "inquiresPage";
+    public ResponseEntity<ApiResponse<?>> inquiresPage(){
+
+        List<Inquire> inquires = adminService.InquiresProcess();
+
+        return ResponseEntity.ok(ApiResponse.success(inquires));
     }
 
     @GetMapping("/inquires/{inquireId}")
