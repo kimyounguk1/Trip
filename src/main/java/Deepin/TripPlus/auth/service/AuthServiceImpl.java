@@ -1,7 +1,7 @@
 package Deepin.TripPlus.auth.service;
 
-import Deepin.TripPlus.Exception.CustomException;
-import Deepin.TripPlus.Exception.ErrorCode;
+import Deepin.TripPlus.exception.CustomException;
+import Deepin.TripPlus.exception.ErrorCode;
 import Deepin.TripPlus.auth.dto.CourseDto;
 import Deepin.TripPlus.auth.dto.HomeDto;
 import Deepin.TripPlus.auth.dto.OnboardingDto;
