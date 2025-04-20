@@ -53,7 +53,8 @@ public class SecurityConfig {
                                 "/auth/**", "/login",
                                 "/v3/api-docs/**",     // Swagger JSON 문서 경로
                                 "/swagger-ui/**",      // Swagger UI 리소스 경로
-                                "/swagger-ui.html"     // Swagger HTML 진입점
+                                "/swagger-ui.html",     // Swagger HTML 진입점
+                                "/course/**"
                         ).permitAll()
                         .requestMatchers("/home", "/course/**", "/edit/**", "/rating", "/courseDt").hasAnyRole("CLIENT", "ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
