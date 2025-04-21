@@ -1,6 +1,6 @@
 package Deepin.TripPlus.auth.controller;
 
-import Deepin.TripPlus.commenDto.ApiResponse;
+import Deepin.TripPlus.commonDto.ApiResponse;
 import Deepin.TripPlus.auth.dto.HomeDto;
 import Deepin.TripPlus.auth.dto.OnboardingDto;
 import Deepin.TripPlus.auth.dto.RegisterDto;

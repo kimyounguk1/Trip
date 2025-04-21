@@ -40,8 +40,8 @@ public class CourseDetail {
     @Column(name = "SEQUENCE")
     private int sequence;
 
-    @OneToOne
-    @JoinColumn(name = "course_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "COURSE_ID")
     private Course course;
 
 }

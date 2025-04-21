@@ -70,11 +70,11 @@ public class Course {
         rating.setCourse(this);
     }
 
-    @OneToOne(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
-    private CourseDetail courseDt;
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CourseDetail> courseDts;
 
     public void addCourseDt(CourseDetail courseDt) {
-        this.courseDt = courseDt;
+        courseDts.add(courseDt);
         courseDt.setCourse(this);
     }
 

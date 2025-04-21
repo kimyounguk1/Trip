@@ -1,4 +1,4 @@
-package Deepin.TripPlus.commenDto;
+package Deepin.TripPlus.commonDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
