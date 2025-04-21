@@ -1,6 +1,6 @@
 package Deepin.TripPlus.edit.controller;
 
-import Deepin.TripPlus.commenDto.ApiResponse;
+import Deepin.TripPlus.commonDto.ApiResponse;
 import Deepin.TripPlus.edit.dto.InquireDto;
 import Deepin.TripPlus.edit.dto.NoticeDtDto;
 import Deepin.TripPlus.edit.dto.NoticeDto;

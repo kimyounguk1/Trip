@@ -1,13 +1,12 @@
 package Deepin.TripPlus.admin.controller;
 
 import Deepin.TripPlus.admin.service.AdminService;
-import Deepin.TripPlus.commenDto.ApiResponse;
+import Deepin.TripPlus.commonDto.ApiResponse;
 import Deepin.TripPlus.entity.CourseDetail;
 import Deepin.TripPlus.entity.Inquire;
 import Deepin.TripPlus.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
