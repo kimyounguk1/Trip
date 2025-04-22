@@ -1,22 +1,21 @@
-package Deepin.TripPlus.edit.dto;
+package Deepin.TripPlus.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
+@Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class NoticeDto {
-
-    private Long noticeId;
+public class AdminNoticeDto {
 
     private String title;
 
-    private String date;
+    private String content;
 
     private String noticeType;
+
+    private String createDate;
 
 }
