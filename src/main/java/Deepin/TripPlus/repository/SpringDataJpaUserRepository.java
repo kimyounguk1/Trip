@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -14,6 +15,8 @@ public interface SpringDataJpaUserRepository extends JpaRepository<User, Long> {
     Boolean existsByEmail(String email);
 
     User findByEmail(String email);
+
+    List<User> findByNameContaining(String username);
 
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.courses c " +
             "WHERE u.email = :email " +

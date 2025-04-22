@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 public class Rating {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "RATING_ID")
     private Long id;
 

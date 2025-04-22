@@ -16,7 +16,7 @@ import java.util.Date;
 @Setter
 public class Model {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MODEL_ID")
     private Long id;
 
