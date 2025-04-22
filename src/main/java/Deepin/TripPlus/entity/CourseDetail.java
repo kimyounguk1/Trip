@@ -14,7 +14,7 @@ import java.util.Date;
 @Setter
 public class CourseDetail {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue
     @Column(name = "COURSE_DT_ID")
     private Long id;
 

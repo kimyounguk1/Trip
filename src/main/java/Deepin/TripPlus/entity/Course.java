@@ -18,7 +18,7 @@ import java.util.List;
 @Setter
 public class Course {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue
     @Column(name = "COURSE_ID")
     private Long id;
 
