@@ -5,18 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
+@Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class NoticeDto {
-
-    private Long noticeId;
+public class NoticeSaveDto {
 
     private String title;
 
-    private String date;
+    private String content;
 
     private String noticeType;
-
 }
