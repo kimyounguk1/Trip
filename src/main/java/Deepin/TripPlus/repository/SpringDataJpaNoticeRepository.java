@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface SpringDataJpaNoticeRepository extends JpaRepository<Notice, Long> {
 
     Optional<Notice> findById(Long id);
+
+    List<Notice> findByTitleContaining(String title);
 }

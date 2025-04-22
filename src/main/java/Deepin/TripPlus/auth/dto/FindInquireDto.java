@@ -1,4 +1,4 @@
-package Deepin.TripPlus.edit.dto;
+package Deepin.TripPlus.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,14 +9,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class NoticeDto {
+public class FindInquireDto {
 
-    private Long noticeId;
+    private String username;
 
     private String title;
-
-    private String date;
-
-    private String noticeType;
-
 }

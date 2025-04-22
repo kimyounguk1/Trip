@@ -1,14 +1,17 @@
 package Deepin.TripPlus.admin.controller;
 
 import Deepin.TripPlus.admin.service.AdminService;
+import Deepin.TripPlus.auth.dto.*;
 import Deepin.TripPlus.commonDto.ApiResponse;
-import Deepin.TripPlus.entity.CourseDetail;
-import Deepin.TripPlus.entity.Inquire;
-import Deepin.TripPlus.entity.User;
+import Deepin.TripPlus.edit.dto.InquireSaveDto;
+import Deepin.TripPlus.edit.dto.NoticeSaveDto;
+import Deepin.TripPlus.entity.*;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -26,7 +29,7 @@ public class AdminController {
     @GetMapping("/users")
     public ResponseEntity<ApiResponse<?>> usersPage(){
 
-        List<User> users = adminService.UsersProcess();
+        List<User> users = adminService.usersProcess();
 
         return ResponseEntity.ok(ApiResponse.success(users));
     }
@@ -34,7 +37,7 @@ public class AdminController {
     @GetMapping("/courseDetails")
     public ResponseEntity<ApiResponse<?>> courseDetailsPage(){
 
-        List<CourseDetail> courseDetails = adminService.CourseDetailsProcess();
+        List<CourseDetail> courseDetails = adminService.courseDetailsProcess();
 
         return ResponseEntity.ok(ApiResponse.success(courseDetails));
     }
@@ -42,54 +45,82 @@ public class AdminController {
     @GetMapping("/inquires")
     public ResponseEntity<ApiResponse<?>> inquiresPage(){
 
-        List<Inquire> inquires = adminService.InquiresProcess();
+        List<Inquire> inquires = adminService.inquiresProcess();
 
         return ResponseEntity.ok(ApiResponse.success(inquires));
     }
 
     @GetMapping("/inquires/{inquireId}")
-    public String inquirePage(@PathVariable("inquireId") int inquireId){
-        return "inquirePage";
+    public ResponseEntity<ApiResponse<?>> inquirePage(@PathVariable("inquireId") Long inquireId){
+
+        AdminInquireDto adminInquireDto = adminService.adminInquireProcess(inquireId);
+
+        return ResponseEntity.ok(ApiResponse.success(adminInquireDto));
     }
 
     @GetMapping("/notices")
-    public String noticesPage(){
-        return "noticesPage";
+    public ResponseEntity<ApiResponse<?>> noticesPage(){
+
+        List<Notice> notices = adminService.noticesProcess();
+
+        return ResponseEntity.ok(ApiResponse.success(notices));
     }
 
     @GetMapping("/notices/{noticeId}")
-    public String noticeUpdatePage(@PathVariable("noticeId") int noticeId){
-        return "noticeUpdatePage";
+    public ResponseEntity<ApiResponse<?>> noticePage(@PathVariable("noticeId") Long noticeId){
+
+        AdminNoticeDto adminNoticeDto = adminService.noticeProcess(noticeId);
+
+        return ResponseEntity.ok(ApiResponse.success(adminNoticeDto));
     }
 
     @GetMapping("/models")
-    public String modelsPage(){
-        return "modelsPage";
+    public ResponseEntity<ApiResponse<?>> modelsPage(){
+
+        AdminModelDto adminModelDto = adminService.modelsProcess();
+
+        return ResponseEntity.ok(ApiResponse.success(adminModelDto));
     }
 
     @PostMapping("/users/findUser")
-    public String findUser(){
-        return "findUser";
+    public ResponseEntity<ApiResponse<?>> findUser(@RequestParam("userName") String username){
+
+        List<User> users = adminService.findUsersProcess(username);
+
+        return ResponseEntity.ok(ApiResponse.success(users));
     }
 
     @PostMapping("/inquires/findInquire")
-    public String findInquire(){
-        return "findInquire";
+    public ResponseEntity<ApiResponse<?>> findInquire(@RequestBody FindInquireDto findInquireDto){
+
+        List<Inquire> inquires = adminService.findInquiresProcess(findInquireDto);
+
+        return ResponseEntity.ok(ApiResponse.success(inquires));
     }
 
     @PostMapping("/inquires/{inquireId}")
-    public String inquireSaveProcess(@PathVariable("inquireId") int inquireId){
-        return "inquireSaveProcess";
+    public ResponseEntity<ApiResponse<?>> inquireSaveProcess(@PathVariable("inquireId") Long inquireId
+    , @RequestBody InquireSaveDto inquireSaveDto){
+
+        adminService.inquireSaveProcess(inquireId, inquireSaveDto);
+
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @PostMapping("/notices/save")
-    public String saveNoticeProcess(){
-        return "saveNotice";
+    public ResponseEntity<ApiResponse<?>> saveNoticeProcess(@RequestBody NoticeSaveDto noticeSaveDto){
+
+        adminService.noticeSaveProcess(noticeSaveDto);
+
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @PostMapping("/notices/findNotice")
-    public String findNoticeProcess(){
-        return "findNotice";
+    public ResponseEntity<ApiResponse<?>> findNoticeProcess(@RequestParam("title") String title){
+
+        List<Notice> notices = adminService.findNoticeProcess(title);
+
+        return ResponseEntity.ok(ApiResponse.success(notices));
     }
 
     @PostMapping("/models/apply")
@@ -103,27 +134,43 @@ public class AdminController {
     }
 
     @PutMapping("/users/deactive/{userId}")
-    public String deactiveUserProcess(@PathVariable("usreId") int usreId){
-        return "deactiveUser";
+    public ResponseEntity<ApiResponse<?>> SuspendUserProcess(@PathVariable("userId") Long userId){
+
+        User user = adminService.suspendUserProcess(userId);
+
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @PutMapping("/notices/update/{noticeId}")
-    public String updateNoticeProcess(@PathVariable("noticeId") int noticeId){
-        return "updateNotice";
+    public ResponseEntity<ApiResponse<?>> updateNoticeProcess(@PathVariable("noticeId") Long noticeId
+    , @RequestBody AdminNoticeUpdateDto adminNoticeUpdateDto){
+
+        adminService.updateNoticeProcess(noticeId, adminNoticeUpdateDto);
+
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @DeleteMapping("/users/delete/{userId}")
-    public String deleteUserProcess(@PathVariable("userId") int userId){
-        return "deleteUser";
+    public ResponseEntity<ApiResponse<?>> deleteUserProcess(@PathVariable("userId") Long userId){
+
+        adminService.deleteUserProcess(userId);
+
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @DeleteMapping("/courses/delete/{courseDtId}")
-    public String deleteCourseProcess(@PathVariable("courseDtId") int courseDtId){
-        return "deleteCourse";
+    public ResponseEntity<ApiResponse<?>> deleteCourseProcess(@PathVariable("courseDtId") Long courseDtId){
+
+        adminService.deleteCourseDtProcess(courseDtId);
+
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @DeleteMapping("/notices/delete/{noticeId}")
-    public String deleteNoticeProcess(@PathVariable("noticeId") int noticeId){
-        return "deleteNotice";
+    public ResponseEntity<ApiResponse<?>> deleteNoticeProcess(@PathVariable("noticeId") Long noticeId){
+
+        adminService.deleteNoticeProcess(noticeId);
+
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 }

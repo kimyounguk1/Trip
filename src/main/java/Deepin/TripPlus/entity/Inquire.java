@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 public class Inquire {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name ="INQUIRE_ID")
     private Long id;
 
