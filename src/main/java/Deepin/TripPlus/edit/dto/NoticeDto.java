@@ -17,6 +17,4 @@ public class NoticeDto {
 
     private String date;
 
-    private String noticeType;
-
 }

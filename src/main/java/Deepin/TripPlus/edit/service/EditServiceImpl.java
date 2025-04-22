@@ -41,7 +41,6 @@ public class EditServiceImpl implements EditService {
                 .map(notice ->new NoticeDto(
                         notice.getId(),
                         notice.getTitle(),
-                        notice.getNoticeType(),
                         notice.getCreatedDate().toString()
 
                 ))
@@ -57,14 +56,12 @@ public class EditServiceImpl implements EditService {
         String title = notice.getTitle();
         String content = notice.getContent();
         String date = notice.getCreatedDate().toString();
-        String noticeType = notice.getNoticeType();
 
         NoticeDtDto noticeDt = new NoticeDtDto();
 
         noticeDt.setTitle(title);
         noticeDt.setContent(content);
         noticeDt.setDate(date);
-        noticeDt.setNoticeType(noticeType);
 
         return noticeDt;
     }

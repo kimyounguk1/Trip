@@ -34,9 +34,9 @@ dependencies {
 	//OAuth2
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
-	implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
 
-	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+	// MySQL Connector (중복 제거)
+	runtimeOnly 'com.mysql:mysql-connector-j'
 
 	// Lombok 의존성 (컴파일 시에만 필요)
 	compileOnly 'org.projectlombok:lombok'
