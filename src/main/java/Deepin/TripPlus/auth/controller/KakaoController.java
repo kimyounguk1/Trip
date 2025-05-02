@@ -22,7 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-@Controller
+@RestController
 @RequestMapping("/auth")
 public class KakaoController {
 

@@ -54,9 +54,10 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",     // Swagger JSON 문서 경로
                                 "/swagger-ui/**",      // Swagger UI 리소스 경로
                                 "/swagger-ui.html",     // Swagger HTML 진입점
-                                "/course/**"
+                                "/course/**",
+                                "/admin/register"
                         ).permitAll()
-                        .requestMatchers("/home", "/course/**", "/edit/**", "/rating", "/courseDt").hasAnyRole("CLIENT", "ADMIN")
+                        .requestMatchers("/home", "/course/**", "/rating", "/courseDt", "/edit/**").hasAnyRole("CLIENT", "ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated());
         http
@@ -66,6 +67,9 @@ public class SecurityConfig {
         http
                 .sessionManagement((session)->session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http
+                .logout((logout) -> logout.disable());
+
 
         return http.build();
     }

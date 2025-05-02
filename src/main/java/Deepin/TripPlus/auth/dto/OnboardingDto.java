@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 public class OnboardingDto {
@@ -14,7 +15,7 @@ public class OnboardingDto {
     private String gender;
 
     @NotBlank(message = "필수로 입력해야 합니다.")
-    private String userTripType;
+    private List<String> userTripType;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @NotBlank(message = "필수로 입력해야 합니다.")

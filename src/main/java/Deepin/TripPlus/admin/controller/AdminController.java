@@ -1,5 +1,6 @@
 package Deepin.TripPlus.admin.controller;
 
+import Deepin.TripPlus.admin.dto.*;
 import Deepin.TripPlus.admin.service.AdminService;
 import Deepin.TripPlus.auth.dto.*;
 import Deepin.TripPlus.commonDto.ApiResponse;
@@ -7,11 +8,9 @@ import Deepin.TripPlus.edit.dto.InquireSaveDto;
 import Deepin.TripPlus.edit.dto.NoticeSaveDto;
 import Deepin.TripPlus.entity.*;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -29,23 +28,23 @@ public class AdminController {
     @GetMapping("/users")
     public ResponseEntity<ApiResponse<?>> usersPage(){
 
-        List<User> users = adminService.usersProcess();
+        List<UserDto> users = adminService.usersProcess();
 
         return ResponseEntity.ok(ApiResponse.success(users));
     }
 
-    @GetMapping("/courseDetails")
+    @GetMapping("/courseDetails")  //dto로 반환
     public ResponseEntity<ApiResponse<?>> courseDetailsPage(){
 
-        List<CourseDetail> courseDetails = adminService.courseDetailsProcess();
+        List<CourseDetailDto> courseDetails = adminService.courseDetailsProcess();
 
         return ResponseEntity.ok(ApiResponse.success(courseDetails));
     }
 
-    @GetMapping("/inquires")
+    @GetMapping("/inquires")   //dto로 반환
     public ResponseEntity<ApiResponse<?>> inquiresPage(){
 
-        List<Inquire> inquires = adminService.inquiresProcess();
+        List<InquireDto> inquires = adminService.inquiresProcess();
 
         return ResponseEntity.ok(ApiResponse.success(inquires));
     }
@@ -82,10 +81,18 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.success(adminModelDto));
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponse<?>> registerPage(@RequestBody RegisterDto registerDto){
+
+        adminService.registerProcess(registerDto);
+
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
     @PostMapping("/users/findUser")
     public ResponseEntity<ApiResponse<?>> findUser(@RequestParam("userName") String username){
 
-        List<User> users = adminService.findUsersProcess(username);
+        List<UserDto> users = adminService.findUsersProcess(username);
 
         return ResponseEntity.ok(ApiResponse.success(users));
     }
@@ -93,7 +100,7 @@ public class AdminController {
     @PostMapping("/inquires/findInquire")
     public ResponseEntity<ApiResponse<?>> findInquire(@RequestBody FindInquireDto findInquireDto){
 
-        List<Inquire> inquires = adminService.findInquiresProcess(findInquireDto);
+        List<InquireDto> inquires = adminService.findInquiresProcess(findInquireDto);
 
         return ResponseEntity.ok(ApiResponse.success(inquires));
     }
@@ -124,11 +131,17 @@ public class AdminController {
     }
 
     @PostMapping("/models/apply")
-    public String applyModelProcess(){
+    public String applyModelProcess(@RequestBody ModelApplyDto modelApplyDto){
+
         return "applyModel";
     }
 
-    @PostMapping("/models/train")
+    @PostMapping("/models/content/train")
+    public String trainContentModelProcess(@RequestBody ContentTrainDto contentTrainDto){
+        return "trainModel";
+    }
+
+    @PostMapping("/models/cooperation/train")
     public String trainModelProcess(){
         return "trainModel";
     }

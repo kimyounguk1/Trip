@@ -16,4 +16,6 @@ public interface AuthService {
 
     HomeDto homeProcess(HttpServletRequest request);
 
+    Boolean checkEmailProcess(String email);
+
 }

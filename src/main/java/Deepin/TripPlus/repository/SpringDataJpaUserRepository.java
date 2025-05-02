@@ -18,10 +18,8 @@ public interface SpringDataJpaUserRepository extends JpaRepository<User, Long> {
 
     List<User> findByNameContaining(String username);
 
-    @Query("SELECT u FROM User u LEFT JOIN FETCH u.courses c " +
-            "WHERE u.email = :email " +
-            "AND :today BETWEEN c.startDate AND c.endDate")
-    Optional<User> findByEmailWithCourses(@Param("email") String email, @Param("today") Date today);
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.courses c WHERE u.email = :email")
+    Optional<User> findByEmailWithCourses(@Param("email") String email);
 
     @Query("SELECT u From User u LEFT JOIN FETCH u.inquires WHERE u.email = :email")
     User findByEmailWithInquires(@Param("email") String email);
