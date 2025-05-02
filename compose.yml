@@ -1,0 +1,35 @@
+services:
+
+  my-db-server:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: TRIP
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping"]
+      interval: 5s
+      retries: 10
+
+
+  my-server:
+    build: .
+    ports:
+      - 8080:8080
+    depends_on:
+      my-db-server:
+        condition: service_healthy
+      my-cache-server:
+        condition: service_healthy
+
+  my-cache-server:
+    image: redis
+    ports:
+      - 6537:6537
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 10

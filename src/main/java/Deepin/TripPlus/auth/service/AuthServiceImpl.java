@@ -1,5 +1,6 @@
 package Deepin.TripPlus.auth.service;
 
+import Deepin.TripPlus.entity.Course;
 import Deepin.TripPlus.exception.CustomException;
 import Deepin.TripPlus.exception.ErrorCode;
 import Deepin.TripPlus.auth.dto.CourseDto;
@@ -16,8 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,46 +65,62 @@ public class AuthServiceImpl implements AuthService {
     public void onboardingProcess(OnboardingDto onboardingDto, HttpServletRequest request) {
 
         String gender = onboardingDto.getGender();
-        String userTripType = onboardingDto.getUserTripType();
+        List<String> userTripTypeList = onboardingDto.getUserTripType();
+
         Date birth = onboardingDto.getBirth();
 
         String email = emailProcess(request);
 
         User data = jpaUserRepository.findByEmail(email);
-        if(data != null) {
+        if (data != null) {
             data.setGender(gender);
-            data.setTripType(userTripType);
-            data.setBirth(birth);
+
+            // List<String>을 "힐링","모험" 형식으로 변환
+            String userTripTypeString = userTripTypeList.stream()
+                    .map(s -> "\"" + s + "\"")
+                    .collect(Collectors.joining(","));
+
+            data.setTripType(userTripTypeString);
+
+            data.setBirth(onboardingDto.getBirth());
             data.setFirst(false);
-        }else{
+        } else {
             throw new CustomException(ErrorCode.NON_EXIST_USER);
         }
     }
 
     @Override
     public HomeDto homeProcess(HttpServletRequest request) {
-
         String email = emailProcess(request);
         Date today = new Date();
 
-        User data = jpaUserRepository.findByEmailWithCourses(email, today).orElseThrow(()-> new CustomException(ErrorCode.NON_EXIST_USER));
-        boolean isFirst = data.isFirst();
-        List<CourseDto> courseDto =
-                data.getCourses().stream()
-                .map(course-> new CourseDto(
+        User user = jpaUserRepository.findByEmailWithCourses(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.NON_EXIST_USER));
+
+        boolean isFirst = user.isFirst();
+
+        // 오늘 날짜 기준, 종료일이 오늘 이후거나 같은 course들 중에서 가장 빠른 종료일 1개 선택
+        Optional<Course> closestCourse = user.getCourses().stream()
+                .filter(course -> !course.getEndDate().before(today)) // 종료일이 오늘보다 같거나 나중인 것
+                .min(Comparator.comparing(Course::getEndDate)); // 종료일이 가장 가까운 하나
+
+        List<CourseDto> courseDto = closestCourse
+                .map(course -> List.of(new CourseDto(
                         course.getId(),
                         course.getTitle(),
                         course.getArea(),
                         course.getStartDate().toString(),
                         course.getEndDate().toString(),
-                        course.getMeansTp()))
-                .collect(Collectors.toList());
+                        course.getMeansTp())))
+                .orElse(List.of()); // 없으면 빈 리스트
 
-        HomeDto homeDto = new HomeDto();
-        homeDto.setIsFirst(isFirst);
-        homeDto.setCourse(courseDto);
+        return new HomeDto(isFirst, courseDto);
+    }
 
-        return homeDto;
+    @Override
+    public Boolean checkEmailProcess(String email) {
+        Boolean value = jpaUserRepository.existsByEmail(email);
+        return value;
     }
 
     public String emailProcess(HttpServletRequest request){

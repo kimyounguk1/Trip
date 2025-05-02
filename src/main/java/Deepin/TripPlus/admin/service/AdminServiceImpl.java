@@ -1,5 +1,9 @@
 package Deepin.TripPlus.admin.service;
 
+import Deepin.TripPlus.admin.dto.ContentTrainDto;
+import Deepin.TripPlus.admin.dto.CourseDetailDto;
+import Deepin.TripPlus.admin.dto.InquireDto;
+import Deepin.TripPlus.admin.dto.UserDto;
 import Deepin.TripPlus.auth.dto.*;
 import Deepin.TripPlus.edit.dto.InquireSaveDto;
 import Deepin.TripPlus.edit.dto.NoticeSaveDto;
@@ -8,12 +12,14 @@ import Deepin.TripPlus.exception.CustomException;
 import Deepin.TripPlus.exception.ErrorCode;
 import Deepin.TripPlus.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,23 +31,58 @@ public class AdminServiceImpl implements AdminService {
     private final SpringDataJpaNoticeRepository noticeRepository;
     private final SpringDataJpaModelRepository modelRepository;
     private final InquireRepository inquireDao;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
-    public List<User> usersProcess() {
+    public List<UserDto> usersProcess() {
         List<User> users = userRepository.findAll();
-        return users;
+        List<UserDto> value = users.stream()
+                .map(user -> new UserDto(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        user.getGender(),
+                        user.getBirth().toString(),
+                        user.isSuspended(),
+                        user.getCreatedDate().toString()
+
+                ))
+                .collect(Collectors.toList());
+
+        return value;
+
     }
 
     @Override
-    public List<CourseDetail> courseDetailsProcess() {
+    public List<CourseDetailDto> courseDetailsProcess() {
         List<CourseDetail> courseDts = courseDtRepository.findAll();
-        return courseDts;
+
+        List<CourseDetailDto> value = courseDts.stream()
+                .map(courseDt -> new CourseDetailDto(
+                        courseDt.getId(),
+                        courseDt.getPlaceName(),
+                        courseDt.getPlaceAddress(),
+                        courseDt.getPlaceType()
+                ))
+                .collect(Collectors.toList());
+        return value;
     }
 
     @Override
-    public List<Inquire> inquiresProcess() {
-        List<Inquire> inquires = inquireRepository.findAll();
-        return inquires;
+    public List<InquireDto> inquiresProcess() {
+        List<Inquire> inquires = inquireRepository.findAllWithUser();
+        List<InquireDto> value = inquires.stream()
+                .map(inquire -> new InquireDto(
+                        inquire.getId(),
+                        inquire.getUser().getId(),
+                        inquire.getTitle(),
+                        inquire.getContent(),
+                        inquire.getCreatedDate().toString(),
+                        inquire.getAnswer()
+                ))
+                .collect(Collectors.toList());
+
+        return value;
     }
 
     @Override
@@ -94,21 +135,46 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<User> findUsersProcess(String username) {
+    public List<UserDto> findUsersProcess(String username) {
 
         List<User> users = userRepository.findByNameContaining(username);
 
-        return users;
+        List<UserDto> value = users.stream()
+                .map(user -> new UserDto(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        user.getGender(),
+                        user.getBirth().toString(),
+                        user.isSuspended(),
+                        user.getCreatedDate().toString()
+
+                ))
+                .collect(Collectors.toList());
+
+        return value;
+
     }
 
     @Override
-    public List<Inquire> findInquiresProcess(FindInquireDto findInquireDto) {
+    public List<InquireDto> findInquiresProcess(FindInquireDto findInquireDto) {
         String title = findInquireDto.getTitle();
         String username = findInquireDto.getUsername();
 
         List<Inquire> inquires = inquireDao.findByTitleOrUserName(title, username);
 
-        return inquires;
+        List<InquireDto> value = inquires.stream()
+                .map(inquire -> new InquireDto(
+                        inquire.getId(),
+                        inquire.getUser().getId(),
+                        inquire.getTitle(),
+                        inquire.getContent(),
+                        inquire.getCreatedDate().toString(),
+                        inquire.getAnswer()
+                ))
+                .collect(Collectors.toList());
+
+        return value;
     }
 
     @Override
@@ -195,6 +261,66 @@ public class AdminServiceImpl implements AdminService {
     public void deleteNoticeProcess(Long noticeId) {
 
         noticeRepository.deleteById(noticeId);
+
+    }
+
+    @Override
+    @Transactional
+    public void registerProcess(RegisterDto registerDto) {
+        String email = registerDto.getEmail();
+        String password = registerDto.getPassword();
+        String name = registerDto.getName();
+
+        Boolean isExist = userRepository.existsByEmail(email);
+
+        if(isExist) {
+            throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
+        }
+
+        User data = new User();
+        data.setEmail(email);
+        data.setPassword(bCryptPasswordEncoder.encode(password));
+        data.setRole("ROLE_ADMIN");
+        data.setName(name);
+        data.setFirst(true);
+        data.setSuspended(false);
+
+
+        userRepository.save(data);
+    }
+
+    @Override
+    @Transactional
+    public void trainContentModelProcess(ContentTrainDto contentTrainDto) throws IOException, InterruptedException {
+        String name = contentTrainDto.getName();
+        int nEstimators = contentTrainDto.getNEstimators();
+        Double learningRate = contentTrainDto.getLearningRate();
+        int maxDepth = contentTrainDto.getMaxDepth();
+        String information = contentTrainDto.getInformation();
+
+        ProcessBuilder pb = new ProcessBuilder("python3", "모델파일.py",
+                "--n_estimators", String.valueOf(nEstimators),
+                "--learning_rate", String.valueOf(learningRate),
+                "--max_depth", String.valueOf(maxDepth)
+        );
+
+        Process process = pb.start();
+
+        int exitCode = process.waitFor();
+
+        if (exitCode != 0) {
+            throw new RuntimeException("모델 학습 실패: exitCode = " + exitCode);
+        }
+
+        Model model = new Model();
+        model.setName(name);
+        model.setNEstimators(nEstimators);
+        model.setLearningRate(learningRate);
+        model.setMaxDepth(maxDepth);
+        model.setInformation(information);
+        model.setModelType("CONTENT");
+
+        modelRepository.save(model);
 
     }
 }

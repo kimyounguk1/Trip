@@ -26,8 +26,17 @@ public class Model {
     @Column(name = "MODEL_TYPE")
     private String modelType;
 
-    @Column(name = "PARAMA")
-    private int parama;
+    @Column(name = "NESTIMATORS")
+    private Integer nEstimators;
+
+    @Column(name = "LEARNINGRATE")
+    private Double learningRate;
+
+    @Column(name = "MAXDEPTH")
+    private Integer maxDepth;
+
+    @Column(name = "MINSAMPLESSPLIT")
+    private Integer minSamplesSplit;
 
     @Column(name = "INFORMATION", columnDefinition = "TEXT")
     private String information;

@@ -1,19 +1,24 @@
 package Deepin.TripPlus.admin.service;
 
+import Deepin.TripPlus.admin.dto.ContentTrainDto;
+import Deepin.TripPlus.admin.dto.CourseDetailDto;
+import Deepin.TripPlus.admin.dto.InquireDto;
+import Deepin.TripPlus.admin.dto.UserDto;
 import Deepin.TripPlus.auth.dto.*;
 import Deepin.TripPlus.edit.dto.InquireSaveDto;
 import Deepin.TripPlus.edit.dto.NoticeSaveDto;
 import Deepin.TripPlus.entity.*;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface AdminService {
 
-    List<User> usersProcess();
+    List<UserDto> usersProcess();
 
-    List<CourseDetail> courseDetailsProcess();
+    List<CourseDetailDto> courseDetailsProcess();
 
-    List<Inquire> inquiresProcess();
+    List<InquireDto> inquiresProcess();
 
     AdminInquireDto adminInquireProcess(Long inquireId);
 
@@ -23,9 +28,9 @@ public interface AdminService {
 
     AdminModelDto modelsProcess();
 
-    List<User> findUsersProcess(String username);
+    List<UserDto> findUsersProcess(String username);
 
-    List<Inquire> findInquiresProcess(FindInquireDto findInquireDto);
+    List<InquireDto> findInquiresProcess(FindInquireDto findInquireDto);
 
     void inquireSaveProcess(Long inquireId, InquireSaveDto inquireSaveDto);
 
@@ -42,4 +47,8 @@ public interface AdminService {
     void deleteCourseDtProcess(Long courseDtId);
 
     void deleteNoticeProcess(Long noticeId);
+
+    void registerProcess(RegisterDto registerDto);
+
+    void trainContentModelProcess(ContentTrainDto contentTrainDto) throws IOException, InterruptedException;
 }

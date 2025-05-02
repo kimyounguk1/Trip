@@ -1,12 +1,9 @@
 package Deepin.TripPlus.edit.service;
 
+import Deepin.TripPlus.edit.dto.*;
 import Deepin.TripPlus.exception.CustomException;
 import Deepin.TripPlus.exception.ErrorCode;
 import Deepin.TripPlus.auth.jwt.JWTUtil;
-import Deepin.TripPlus.edit.dto.InquireDto;
-import Deepin.TripPlus.edit.dto.NoticeDtDto;
-import Deepin.TripPlus.edit.dto.NoticeDto;
-import Deepin.TripPlus.edit.dto.SubmitDto;
 import Deepin.TripPlus.entity.Inquire;
 import Deepin.TripPlus.entity.Notice;
 import Deepin.TripPlus.entity.User;
@@ -86,7 +83,7 @@ public class EditServiceImpl implements EditService {
                         inquire.getCreatedDate().toString(),
                         inquire.isAnswered(),
                         inquire.getAnswer(),
-                        inquire.getAnsweredDate().toString()
+                        inquire.getAnsweredDate() != null ? inquire.getAnsweredDate().toString() : null
                 ))
                 .collect(Collectors.toList());
     }
@@ -112,11 +109,17 @@ public class EditServiceImpl implements EditService {
 
     @Override
     @Transactional
-    public User modifyUserProcess(HttpServletRequest request, String userTripType) {
+    public User modifyUserProcess(HttpServletRequest request, ModifyDto modifyDto) {
 
         User user = extracted(request);
 
-        user.setTripType(userTripType);
+        List<String> modify = modifyDto.getModify();
+
+        String value = modify.stream()
+                .map(n -> "\"" + n + "\"")
+                .collect(Collectors.joining(","));
+
+        user.setTripType(value);
 
         return user;
     }

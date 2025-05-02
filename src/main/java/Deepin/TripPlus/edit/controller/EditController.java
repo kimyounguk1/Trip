@@ -1,10 +1,7 @@
 package Deepin.TripPlus.edit.controller;
 
 import Deepin.TripPlus.commonDto.ApiResponse;
-import Deepin.TripPlus.edit.dto.InquireDto;
-import Deepin.TripPlus.edit.dto.NoticeDtDto;
-import Deepin.TripPlus.edit.dto.NoticeDto;
-import Deepin.TripPlus.edit.dto.SubmitDto;
+import Deepin.TripPlus.edit.dto.*;
 import Deepin.TripPlus.edit.service.EditService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -53,9 +50,9 @@ public class EditController {
     }
 
     @PutMapping("/modifyUser")
-    public ResponseEntity<ApiResponse<?>> modifyUserProcess(HttpServletRequest request, @RequestParam("userTripType") String userTripType){
+    public ResponseEntity<ApiResponse<?>> modifyUserProcess(HttpServletRequest request, @RequestBody ModifyDto modifyDto){
 
-        editService.modifyUserProcess(request, userTripType);
+        editService.modifyUserProcess(request, modifyDto);
 
         return ResponseEntity.ok(ApiResponse.success(null));
 

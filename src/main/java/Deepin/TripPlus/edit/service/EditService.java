@@ -1,9 +1,6 @@
 package Deepin.TripPlus.edit.service;
 
-import Deepin.TripPlus.edit.dto.InquireDto;
-import Deepin.TripPlus.edit.dto.NoticeDtDto;
-import Deepin.TripPlus.edit.dto.NoticeDto;
-import Deepin.TripPlus.edit.dto.SubmitDto;
+import Deepin.TripPlus.edit.dto.*;
 import Deepin.TripPlus.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -19,7 +16,7 @@ public interface EditService {
 
     User inquireSubmitProcess(HttpServletRequest request, SubmitDto submitDto);
 
-    User modifyUserProcess(HttpServletRequest request, String userTripType);
+    User modifyUserProcess(HttpServletRequest request, ModifyDto modifyDto);
 
     void accountDeleteProcess(HttpServletRequest request);
 
