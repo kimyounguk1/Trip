@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ModelApplyDto {
 
-    private String modelName;
+    private Long modelId;
 
+    private String modelType;
 }

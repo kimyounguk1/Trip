@@ -1,9 +1,6 @@
 package Deepin.TripPlus.admin.service;
 
-import Deepin.TripPlus.admin.dto.ContentTrainDto;
-import Deepin.TripPlus.admin.dto.CourseDetailDto;
-import Deepin.TripPlus.admin.dto.InquireDto;
-import Deepin.TripPlus.admin.dto.UserDto;
+import Deepin.TripPlus.admin.dto.*;
 import Deepin.TripPlus.auth.dto.*;
 import Deepin.TripPlus.edit.dto.InquireSaveDto;
 import Deepin.TripPlus.edit.dto.NoticeSaveDto;
@@ -19,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +30,7 @@ public class AdminServiceImpl implements AdminService {
     private final SpringDataJpaModelRepository modelRepository;
     private final InquireRepository inquireDao;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final SpringDataJpaRatingRepository ratingRepository;
 
     @Override
     public List<UserDto> usersProcess() {
@@ -124,13 +123,44 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public AdminModelDto modelsProcess() {
 
-        List<Model> surveyModels = modelRepository.findByModelType("survey");
-        List<Model> recommendModels = modelRepository.findByModelType("recommend");
+        List<Model> contentModels = modelRepository.findByModelType("CONTENT");
 
+        List<ContentModelDto> contents = contentModels.stream()
+                .map(model -> {
+                    ContentModelDto contentModelDto = new ContentModelDto();
+                    contentModelDto.setModelId(model.getId());
+                    contentModelDto.setModelType(model.getModelType());
+                    contentModelDto.setName(model.getName());
+                    contentModelDto.setInformation(model.getInformation());
+                    contentModelDto.setNEstimators(model.getNEstimators());
+                    contentModelDto.setMaxDepth(model.getMaxDepth());
+                    contentModelDto.setLearningRate(model.getLearningRate());
+                    contentModelDto.setCreateDate(model.getCreatedDate().toString());
+                    contentModelDto.setRate(ratingRepository.findAverageScoreByModelName(model.getName()));
+                    return contentModelDto;
+                })
+                .collect(Collectors.toList());
+
+        List<Model> cooperationModels = modelRepository.findByModelType("COOPERATION");
+
+        List<CooperationModelDto> cooperations = cooperationModels.stream()
+                .map(model -> {
+                    CooperationModelDto cooperationModelDto = new CooperationModelDto();
+                    cooperationModelDto.setModelId(model.getId());
+                    cooperationModelDto.setModelType(model.getModelType());
+                    cooperationModelDto.setName(model.getName());
+                    cooperationModelDto.setInformation(model.getInformation());
+                    cooperationModelDto.setNEstimators(model.getNEstimators());
+                    cooperationModelDto.setMaxDepth(model.getMaxDepth());
+                    cooperationModelDto.setMinSamplesSplit(model.getMinSamplesSplit());
+                    cooperationModelDto.setCreateDate(model.getCreatedDate().toString());
+                    cooperationModelDto.setRate(ratingRepository.findAverageScoreByModelName(model.getName()));
+                    return cooperationModelDto;
+                })
+                .collect(Collectors.toList());
         AdminModelDto adminModelDto = new AdminModelDto();
-        adminModelDto.setSurvey(surveyModels);
-        adminModelDto.setRecommend(recommendModels);
-
+        adminModelDto.setCONTENT(contents);
+        adminModelDto.setCOOPERATION(cooperations);
         return adminModelDto;
     }
 
@@ -301,7 +331,8 @@ public class AdminServiceImpl implements AdminService {
         ProcessBuilder pb = new ProcessBuilder("python3", "모델파일.py",
                 "--n_estimators", String.valueOf(nEstimators),
                 "--learning_rate", String.valueOf(learningRate),
-                "--max_depth", String.valueOf(maxDepth)
+                "--max_depth", String.valueOf(maxDepth),
+                "--file_name", name
         );
 
         Process process = pb.start();
@@ -309,7 +340,7 @@ public class AdminServiceImpl implements AdminService {
         int exitCode = process.waitFor();
 
         if (exitCode != 0) {
-            throw new RuntimeException("모델 학습 실패: exitCode = " + exitCode);
+            throw new CustomException(ErrorCode.MODEL_TRAIN_FAIL);
         }
 
         Model model = new Model();
@@ -321,6 +352,60 @@ public class AdminServiceImpl implements AdminService {
         model.setModelType("CONTENT");
 
         modelRepository.save(model);
+
+    }
+
+    @Transactional
+    @Override
+    public void trainCooperationModelProcess(CooperationTrainDto cooperationTrainDto) throws IOException, InterruptedException {
+            String name = cooperationTrainDto.getName();
+            int nEstimators = cooperationTrainDto.getNEstimators();
+            int maxDepth = cooperationTrainDto.getMaxDepth();
+            int minSamplesSplit = cooperationTrainDto.getMinSamplesSplit();
+            String information = cooperationTrainDto.getInformation();
+
+            ProcessBuilder pb = new ProcessBuilder("python3", "모델파일.py",
+                    "--n_estimators", String.valueOf(nEstimators),
+                    "--max_depth", String.valueOf(maxDepth),
+                    "--min_samples_split", String.valueOf(minSamplesSplit),
+                    "--file_name", name
+            );
+
+            Process process = pb.start();
+
+            int exitCode = process.waitFor();
+
+            if (exitCode != 0) {
+                throw new CustomException(ErrorCode.MODEL_TRAIN_FAIL);
+            }
+
+            Model model = new Model();
+            model.setName(name);
+            model.setNEstimators(nEstimators);
+            model.setMaxDepth(maxDepth);
+            model.setMinSamplesSplit(minSamplesSplit);
+            model.setInformation(information);
+            model.setModelType("COOPERATION");
+
+            modelRepository.save(model);
+
+    }
+
+    @Override
+    @Transactional
+    public void applyModelProcess(ModelApplyDto modelApplyDto) {
+
+        String modelType = modelApplyDto.getModelType();
+        Long modelId = modelApplyDto.getModelId();
+
+        Model newModel = modelRepository.findById(modelId).orElseThrow(() -> new CustomException(ErrorCode.NON_EXIST_MODEL));
+
+        Optional<Model> pastModel = modelRepository.findByModelTypeAndApplyDateIsNotNull(modelType);
+        pastModel.ifPresent(model -> {
+            model.setApplyDate(null);
+        });
+
+        newModel.setApplyDate(LocalDateTime.now());
 
     }
 }
