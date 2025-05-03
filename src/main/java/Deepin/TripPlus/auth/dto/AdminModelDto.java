@@ -1,5 +1,7 @@
 package Deepin.TripPlus.auth.dto;
 
+import Deepin.TripPlus.admin.dto.ContentModelDto;
+import Deepin.TripPlus.admin.dto.CooperationModelDto;
 import Deepin.TripPlus.entity.Model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 public class AdminModelDto {
 
-    private List<Model> survey;
+    private List<ContentModelDto> CONTENT;
 
-    private List<Model> recommend;
+    private List<CooperationModelDto> COOPERATION;
 }

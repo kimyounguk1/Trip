@@ -1,13 +1,11 @@
 package Deepin.TripPlus.admin.service;
 
-import Deepin.TripPlus.admin.dto.ContentTrainDto;
-import Deepin.TripPlus.admin.dto.CourseDetailDto;
-import Deepin.TripPlus.admin.dto.InquireDto;
-import Deepin.TripPlus.admin.dto.UserDto;
+import Deepin.TripPlus.admin.dto.*;
 import Deepin.TripPlus.auth.dto.*;
 import Deepin.TripPlus.edit.dto.InquireSaveDto;
 import Deepin.TripPlus.edit.dto.NoticeSaveDto;
 import Deepin.TripPlus.entity.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
@@ -51,4 +49,8 @@ public interface AdminService {
     void registerProcess(RegisterDto registerDto);
 
     void trainContentModelProcess(ContentTrainDto contentTrainDto) throws IOException, InterruptedException;
+
+    void trainCooperationModelProcess(CooperationTrainDto cooperationTrainDto) throws IOException, InterruptedException;
+
+    void applyModelProcess(ModelApplyDto modelApplyDto);
 }

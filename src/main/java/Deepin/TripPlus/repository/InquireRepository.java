@@ -1,6 +1,8 @@
 package Deepin.TripPlus.repository;
 
 import Deepin.TripPlus.entity.Inquire;
+import Deepin.TripPlus.entity.QInquire;
+import Deepin.TripPlus.entity.QUser;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

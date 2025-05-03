@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -131,19 +132,27 @@ public class AdminController {
     }
 
     @PostMapping("/models/apply")
-    public String applyModelProcess(@RequestBody ModelApplyDto modelApplyDto){
+    public ResponseEntity<ApiResponse<?>> applyModelProcess(@RequestBody ModelApplyDto modelApplyDto){
 
-        return "applyModel";
+        adminService.applyModelProcess(modelApplyDto);
+
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @PostMapping("/models/content/train")
-    public String trainContentModelProcess(@RequestBody ContentTrainDto contentTrainDto){
-        return "trainModel";
+    public ResponseEntity<ApiResponse<?>> trainContentModelProcess(@RequestBody ContentTrainDto contentTrainDto) throws IOException, InterruptedException {
+
+        adminService.trainContentModelProcess(contentTrainDto);
+
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @PostMapping("/models/cooperation/train")
-    public String trainModelProcess(){
-        return "trainModel";
+    public ResponseEntity<ApiResponse<?>> trainModelProcess(@RequestBody CooperationTrainDto cooperationTrainDto) throws IOException, InterruptedException {
+
+        adminService.trainCooperationModelProcess(cooperationTrainDto);
+
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @PutMapping("/users/deactive/{userId}")

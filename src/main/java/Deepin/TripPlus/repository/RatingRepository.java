@@ -1,6 +1,7 @@
 package Deepin.TripPlus.repository;
 
 import Deepin.TripPlus.entity.Model;
+import Deepin.TripPlus.entity.QModel;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
