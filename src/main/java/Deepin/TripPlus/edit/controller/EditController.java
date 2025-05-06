@@ -5,8 +5,12 @@ import Deepin.TripPlus.edit.dto.*;
 import Deepin.TripPlus.edit.service.EditService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 
@@ -18,9 +22,9 @@ public class EditController {
     private final EditService editService;
 
     @GetMapping("/notice")
-    public ResponseEntity<ApiResponse<?>> noticePage(){
+    public ResponseEntity<ApiResponse<?>> noticePage(@PageableDefault(size = 10)Pageable pageable) {
 
-        List<NoticeDto> notice = editService.noticeProcess();
+        Page<NoticeDto> notice = editService.noticeProcess(pageable);
 
         return ResponseEntity.ok(ApiResponse.success(notice));
     }

@@ -14,8 +14,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,7 @@ public class EditServiceImpl implements EditService {
     private final SpringDataJpaUserRepository userRepository;
     private final SpringDataJpaInquireRepository inquireRepository;
     private final JWTUtil jwtUtil;
+    private final SpringDataJpaNoticeRepository springDataJpaNoticeRepository;
 
     @Override
     public List<NoticeDto> noticeProcess() {
@@ -154,5 +156,16 @@ public class EditServiceImpl implements EditService {
         return jwtUtil.getEmail(token);
     }
 
+    @Override
+    public Page<NoticeDto> noticeProcess(Pageable pageable) {
 
+        Page<Notice> notices = springDataJpaNoticeRepository.findAll(pageable);
+
+        return notices.map(notice -> new NoticeDto(
+                notice.getId(),
+                notice.getTitle(),
+                notice.getNoticeType(),
+                notice.getCreatedDate().toString()
+        ));
+    }
 }
