@@ -14,5 +14,4 @@ public interface SpringDataJpaNoticeRepository extends JpaRepository<Notice, Lon
 
     List<Notice> findByTitleContaining(String title);
 
-    Page<Notice> findAll(Pageable pageable);
 }

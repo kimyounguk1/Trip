@@ -10,15 +10,20 @@ import Deepin.TripPlus.entity.User;
 import Deepin.TripPlus.repository.SpringDataJpaInquireRepository;
 import Deepin.TripPlus.repository.SpringDataJpaNoticeRepository;
 import Deepin.TripPlus.repository.SpringDataJpaUserRepository;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
-import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static Deepin.TripPlus.entity.QNotice.notice;
 
 @Service
 @Slf4j
@@ -29,7 +34,7 @@ public class EditServiceImpl implements EditService {
     private final SpringDataJpaUserRepository userRepository;
     private final SpringDataJpaInquireRepository inquireRepository;
     private final JWTUtil jwtUtil;
-    private final SpringDataJpaNoticeRepository springDataJpaNoticeRepository;
+    private  final EntityManager em;
 
     @Override
     public List<NoticeDto> noticeProcess() {
@@ -92,16 +97,16 @@ public class EditServiceImpl implements EditService {
 
     @Override
     @Transactional
-    public User inquireSubmitProcess(HttpServletRequest request, SubmitDto submitDto) {
+        public User inquireSubmitProcess(HttpServletRequest request, SubmitDto submitDto) {
 
-        User user = extracted(request);
+            User user = extracted(request);
 
-        Inquire inquire = new Inquire();
-        inquire.setTitle(submitDto.getTitle());
-        inquire.setContent(submitDto.getContent());
-        inquire.setAnswered(false);
+            Inquire inquire = new Inquire();
+            inquire.setTitle(submitDto.getTitle());
+            inquire.setContent(submitDto.getContent());
+            inquire.setAnswered(false);
 
-        user.addInquire(inquire);
+            user.addInquire(inquire);
 
         inquireRepository.save(inquire);
 
@@ -159,7 +164,7 @@ public class EditServiceImpl implements EditService {
     @Override
     public Page<NoticeDto> noticeProcess(Pageable pageable) {
 
-        Page<Notice> notices = springDataJpaNoticeRepository.findAll(pageable);
+        Page<Notice> notices = editRepository.findAll(pageable);
 
         return notices.map(notice -> new NoticeDto(
                 notice.getId(),
@@ -167,5 +172,35 @@ public class EditServiceImpl implements EditService {
                 notice.getNoticeType(),
                 notice.getCreatedDate().toString()
         ));
+    }
+
+    @Override
+    public Slice<NoticeDto> noticeProcess(Long lastId, int size) {
+
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+
+        List<Notice> notices = queryFactory
+                .selectFrom(notice)
+                .where(lastId != null ? notice.id.lt(lastId) : null)
+                .orderBy(notice.id.desc())
+                .limit(size+1)
+                .fetch();
+
+        boolean hasNext = false;
+        if(notices.size() > size){
+            notices.remove(size);
+            hasNext = true;
+        }
+        List<NoticeDto> noticeDtos = notices.stream()
+                .map(notice -> new NoticeDto(
+                        notice.getId(),
+                        notice.getTitle(),
+                        notice.getNoticeType(),
+                        notice.getCreatedDate().toString()
+                ))
+                .collect(Collectors.toList());
+
+        return new SliceImpl<>(noticeDtos, PageRequest.of(0, size), hasNext);
+
     }
 }

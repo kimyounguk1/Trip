@@ -3,11 +3,14 @@ package Deepin.TripPlus.auth.service;
 import Deepin.TripPlus.auth.dto.AuthTokens;
 import Deepin.TripPlus.auth.dto.LoginResponse;
 import Deepin.TripPlus.auth.jwt.JWTUtil;
+import Deepin.TripPlus.redis.entity.RefreshEntity;
+import Deepin.TripPlus.redis.repository.TokenRepository;
 import Deepin.TripPlus.repository.SpringDataJpaUserRepository;
 import Deepin.TripPlus.entity.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -33,6 +36,7 @@ public class KakaoService {
 
     private final SpringDataJpaUserRepository userRepository;
     private final JWTUtil jwtUtil;
+    private final TokenRepository tokenRepository;
 
     @Value("${kakao.key.client-id}")
     private String clientId;
@@ -141,14 +145,28 @@ public class KakaoService {
             throw new RuntimeException("Kakao User Not Found");
         }
 
-        // JWT 토큰 생성
-        String token = jwtUtil.createJwt(kakaoEmail, role, 60 * 60 * 10L * 1000);
+        // JWT 토큰 생성, refresh토큰 생성
+        String accessToken = jwtUtil.createJwt("access", kakaoEmail, role, 60 * 60 * 10L * 1000);
+        String refreshToken = jwtUtil.createJwt("refresh", kakaoEmail, role, 60 * 60 * 10L * 1000);
 
-        // 클라이언트로 보낼 응답 헤더에 토큰 추가
-        response.addHeader("Authorization", "Bearer " + token);
+        //refresh토큰 redis 저장
+        tokenRepository.save(new RefreshEntity(kakaoEmail, refreshToken, 10000000L));
+
+        // 클라이언트로 보낼 응답 헤더에 토큰 추가, 쿠키 추가
+        response.addHeader("Authorization", "Bearer " + accessToken);
+        response.addCookie(createCookie("refresh", refreshToken));
 
         // 로그인 응답 반환
         return new LoginResponse(kakaoEmail,
-                new AuthTokens(token, null, "Bearer", 3600L));
+                new AuthTokens(accessToken, null, "Bearer", 3600L));
+    }
+
+    private Cookie createCookie(String key, String value){
+        Cookie cookie = new Cookie(key, value);
+        //cookie.setPath("/");
+        //cookie.setSecure(true);
+        cookie.setMaxAge(24*60*60);
+        cookie.setHttpOnly(true);
+        return cookie;
     }
 }

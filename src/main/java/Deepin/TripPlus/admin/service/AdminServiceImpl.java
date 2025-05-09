@@ -31,6 +31,7 @@ public class AdminServiceImpl implements AdminService {
     private final InquireRepository inquireDao;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final SpringDataJpaRatingRepository ratingRepository;
+    
 
     @Override
     public List<UserDto> usersProcess() {
