@@ -25,4 +25,5 @@ public interface EditService {
 
     void accountDeleteProcess(HttpServletRequest request);
 
+    Object noticeProcess(Long lastId, int size);
 }

@@ -21,6 +21,24 @@ public class RedisHandler {
         return redisConfig.redisTemplate().opsForValue();
     }
 
+    // 캐시 저장 메서드
+    public void saveToCache(String key, Object value) {
+        try {
+            getValueOperations().set(key, value);
+        } catch (Exception e) {
+            log.error("캐싱 오류: {}", e.getMessage());
+        }
+    }
+
+    // 캐시 삭제 메서드
+    public void deleteFromCache(String key) {
+        try {
+            redisConfig.redisTemplate().delete(key);
+        } catch (Exception e) {
+            log.error("캐시 삭제 오류: {}", e.getMessage());
+        }
+    }
+
     public int executeOperation(Runnable operation){
         try{
             operation.run();

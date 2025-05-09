@@ -1,6 +1,8 @@
 package Deepin.TripPlus.repository;
 
 import Deepin.TripPlus.entity.User;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,4 +25,6 @@ public interface SpringDataJpaUserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u From User u LEFT JOIN FETCH u.inquires WHERE u.email = :email")
     User findByEmailWithInquires(@Param("email") String email);
+
+
 }

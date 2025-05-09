@@ -1,8 +1,10 @@
 package Deepin.TripPlus.auth.config;
 
+import Deepin.TripPlus.auth.jwt.CustomLogoutFilter;
 import Deepin.TripPlus.auth.jwt.JWTFilter;
 import Deepin.TripPlus.auth.jwt.JWTUtil;
 import Deepin.TripPlus.auth.jwt.LoginFilter;
+import Deepin.TripPlus.redis.repository.TokenRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -20,10 +23,12 @@ public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
+    private final TokenRepository tokenRepository;
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil) {
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, TokenRepository tokenRepository) {
         this.jwtUtil = jwtUtil;
         this.authenticationConfiguration = authenticationConfiguration;
+        this.tokenRepository = tokenRepository;
     }
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -38,7 +43,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain fillerChain(HttpSecurity http) throws Exception {
 
-        LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil);
+        LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, tokenRepository);
         loginFilter.setFilterProcessesUrl("/auth/login"); // 로그인 경로 변경!
 
         http
@@ -55,7 +60,8 @@ public class SecurityConfig {
                                 "/swagger-ui/**",      // Swagger UI 리소스 경로
                                 "/swagger-ui.html",     // Swagger HTML 진입점
                                 "/course/**",
-                                "/admin/register"
+                                "/admin/register",
+                                "/reissue"
                         ).permitAll()
                         .requestMatchers("/home", "/course/**", "/rating", "/courseDt", "/edit/**").hasAnyRole("CLIENT", "ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
@@ -68,7 +74,7 @@ public class SecurityConfig {
                 .sessionManagement((session)->session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http
-                .logout((logout) -> logout.disable());
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil, tokenRepository), LoginFilter.class);
 
 
         return http.build();
