@@ -1,8 +1,10 @@
 package Deepin.TripPlus.auth.jwt;
 
 import Deepin.TripPlus.auth.dto.CustomUserDetails;
+import Deepin.TripPlus.auth.dto.LoginRequest;
 import Deepin.TripPlus.redis.entity.RefreshEntity;
 import Deepin.TripPlus.redis.repository.TokenRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +19,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.UUID;
@@ -38,10 +41,22 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         // 클라이언트 요청에서 email, password 추출 (username = email)
-        String email = obtainUsername(request); // 내부적으로 email을 의미
-        String password = obtainPassword(request);
+//        String email = obtainUsername(request); // 내부적으로 email을 의미
+//        String password = obtainPassword(request);
 
-        // 인증 토큰 생성 (email, password 담기)
+        // JSON 요청 파싱
+        ObjectMapper objectMapper = new ObjectMapper();
+        LoginRequest loginRequest = null;
+        try {
+            loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // email과 password 추출
+        String email = loginRequest.getEmail();
+        String password = loginRequest.getPassword();
+        // 인증 토큰 생성 (email, password 담기), DB와 비교되는 값
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password, null);
 
         // AuthenticationManager를 통해 인증 수행 → UserDetailsService 호출됨

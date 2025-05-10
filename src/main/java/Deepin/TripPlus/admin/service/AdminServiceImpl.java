@@ -9,6 +9,8 @@ import Deepin.TripPlus.exception.CustomException;
 import Deepin.TripPlus.exception.ErrorCode;
 import Deepin.TripPlus.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,6 +100,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Cacheable(value = "notices", unless = "#result == null", key = "'noticeList'")
     public List<Notice> noticesProcess() {
 
         List<Notice> notices = noticeRepository.findAll();
@@ -223,6 +226,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "notices", key = "'noticeList'")
     public void noticeSaveProcess(NoticeSaveDto noticeSaveDto) {
 
         Notice notice = new Notice();
@@ -259,6 +263,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "notices", key = "'noticeList'")
     public Notice updateNoticeProcess(Long noticeId, AdminNoticeUpdateDto noticeUpdateDto) {
 
         Notice notice = noticeRepository.findById(noticeId)
@@ -289,6 +294,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "notices", key = "'noticeList'")
     public void deleteNoticeProcess(Long noticeId) {
 
         noticeRepository.deleteById(noticeId);
