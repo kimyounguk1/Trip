@@ -36,6 +36,7 @@ public class EditServiceImpl implements EditService {
     private final JWTUtil jwtUtil;
     private  final EntityManager em;
 
+    @Cacheable(value = "notices", unless = "#result == null", key = "'noticeList'")
     @Override
     public List<NoticeDto> noticeProcess() {
 
