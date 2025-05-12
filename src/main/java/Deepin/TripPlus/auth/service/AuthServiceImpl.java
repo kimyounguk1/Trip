@@ -17,6 +17,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -92,7 +97,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public HomeDto homeProcess(HttpServletRequest request) {
         String email = emailProcess(request);
-        Date today = new Date();
+        Date today = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
 
         User user = jpaUserRepository.findByEmailWithCourses(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.NON_EXIST_USER));
