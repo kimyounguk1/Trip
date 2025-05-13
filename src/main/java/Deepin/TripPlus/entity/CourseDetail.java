@@ -33,7 +33,7 @@ public class CourseDetail {
     @Column(name = "PLACE_LON") //장소 경도
     private String placeLon;
 
-    @Column(name = "DAYS")
+    @Column(name = "DAY1")
     @Temporal(TemporalType.DATE)
     private Date day;
 
