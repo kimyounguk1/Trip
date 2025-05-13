@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Table(name = "USER")
+@Table(name = "USERS")
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Getter @Setter
