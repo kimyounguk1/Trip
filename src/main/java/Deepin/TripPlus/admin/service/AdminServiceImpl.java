@@ -76,7 +76,7 @@ public class AdminServiceImpl implements AdminService {
         List<InquireDto> value = inquires.stream()
                 .map(inquire -> new InquireDto(
                         inquire.getId(),
-                        inquire.getUser().getId(),
+                        inquire.getUsers().getId(),
                         inquire.getTitle(),
                         inquire.getContent(),
                         inquire.getCreatedDate().toString(),
@@ -200,7 +200,7 @@ public class AdminServiceImpl implements AdminService {
         List<InquireDto> value = inquires.stream()
                 .map(inquire -> new InquireDto(
                         inquire.getId(),
-                        inquire.getUser().getId(),
+                        inquire.getUsers().getId(),
                         inquire.getTitle(),
                         inquire.getContent(),
                         inquire.getCreatedDate().toString(),

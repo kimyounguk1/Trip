@@ -33,7 +33,7 @@ public class AdminInquireDto {
     public static AdminInquireDto from(Inquire inquire) {
         AdminInquireDto dto = new AdminInquireDto();
         dto.setInquireId(inquire.getId());
-        dto.setUserId(inquire.getUser().getId());
+        dto.setUserId(inquire.getUsers().getId());
         dto.setTitle(inquire.getTitle());
         dto.setContent(inquire.getContent());
         dto.setCreateDate(inquire.getCreatedDate().toString());

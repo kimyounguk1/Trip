@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface SpringDataJpaInquireRepository extends JpaRepository<Inquire, Long> {
 
-    @Query("select i from Inquire i LEFT JOIN FETCH i.user")
+    @Query("select i from Inquire i LEFT JOIN FETCH i.users")
     List<Inquire> findAllWithUser();
 
 }

@@ -38,7 +38,7 @@ public class InquireRepository {
         }
 
         return query.selectFrom(inquire)
-                .join(inquire.user, user)
+                .join(inquire.users, user)
                 .where(builder)
                 .fetch();
 
