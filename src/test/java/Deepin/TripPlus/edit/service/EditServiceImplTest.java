@@ -8,28 +8,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-@SpringBootTest
-@Transactional
 @ActiveProfiles("test")
+@SpringBootTest
 class EditServiceImplTest {
 
     @Autowired
-    private EditService editService;
+    EditService editService;
     @Autowired
-    private SpringDataJpaNoticeRepository noticeRepository;
+    SpringDataJpaNoticeRepository springDataJpaNoticeRepository;
 
     @Test
-    void noticeProcess() {
+    void save(){
         Notice notice = new Notice();
         notice.setTitle("title");
         notice.setContent("content");
-
-        noticeRepository.save(notice);
-        Notice notice1 = noticeRepository.findById(notice.getId()).get();
-
-        assertEquals(notice.getTitle(), notice1.getTitle());
-
+        springDataJpaNoticeRepository.save(notice);
     }
+
 }

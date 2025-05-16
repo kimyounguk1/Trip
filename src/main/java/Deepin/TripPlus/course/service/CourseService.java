@@ -17,7 +17,7 @@ public class CourseService {
     private final SpringDataJpaCourseRepository courseRepository;
 
     public List<CourseDto> getCoursesByUserId(Long userId) {
-        List<Course> courseList = courseRepository.findByUser_Id(userId);
+        List<Course> courseList = courseRepository.findByUsers_Id(userId);
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 

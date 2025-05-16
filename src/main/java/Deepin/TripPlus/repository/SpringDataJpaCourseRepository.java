@@ -12,5 +12,5 @@ public interface SpringDataJpaCourseRepository extends JpaRepository<Course, Lon
 
     Optional<Course> findById(long id);
 
-    List<Course> findByUser_Id(Long userId);
+    List<Course> findByUsers_Id(Long userId);
 }

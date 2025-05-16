@@ -45,7 +45,7 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 
 	// Runtime에서 H2 사용 (테스트 용도일 경우)
-	testImplementation 'com.h2database:h2'
+	runtimeOnly 'com.h2database:h2:1.4.200'
 
 	// Lombok annotation processor
 	annotationProcessor 'org.projectlombok:lombok'
