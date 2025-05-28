@@ -179,7 +179,7 @@ public class AdminServiceImpl implements AdminService {
                         user.getName(),
                         user.getEmail(),
                         user.getGender(),
-                        user.getBirth().toString(),
+                        user.getBirth() != null ? user.getBirth().toString() : null,
                         user.isSuspended(),
                         user.getCreatedDate().toString()
 
