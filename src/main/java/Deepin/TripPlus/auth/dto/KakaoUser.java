@@ -8,4 +8,5 @@ import lombok.Setter;
 @Getter @Setter
 public class KakaoUser {
     private String email;
+    private String name;
 }

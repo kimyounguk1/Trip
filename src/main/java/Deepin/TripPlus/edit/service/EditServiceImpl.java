@@ -18,23 +18,28 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.*;
+import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static Deepin.TripPlus.entity.QNotice.notice;
+//import static Deepin.TripPlus.entity.QNotice.notice;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class EditServiceImpl implements EditService {
-
+    private static final String NOTICE_VIEW_KEY = "notice:view:";
     private final SpringDataJpaNoticeRepository editRepository;
     private final SpringDataJpaUserRepository userRepository;
     private final SpringDataJpaInquireRepository inquireRepository;
     private final JWTUtil jwtUtil;
     private  final EntityManager em;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Cacheable(value = "notices", unless = "#result == null", key = "'noticeList'")
     @Override
@@ -56,8 +61,10 @@ public class EditServiceImpl implements EditService {
 
     @Override
     public NoticeDtDto noticeDtProcess(Long id) {
+        incrementViewCountWithWatch(id); // 조회수 안전 증가
 
-        Notice notice = editRepository.findById(id).orElseThrow(()->new CustomException(ErrorCode.NON_EXIST_NOTICE));
+        Notice notice = editRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.NON_EXIST_NOTICE));
 
         String title = notice.getTitle();
         String content = notice.getContent();
@@ -65,7 +72,6 @@ public class EditServiceImpl implements EditService {
         String noticeType = notice.getNoticeType();
 
         NoticeDtDto noticeDt = new NoticeDtDto();
-
         noticeDt.setTitle(title);
         noticeDt.setContent(content);
         noticeDt.setDate(date);
@@ -175,33 +181,70 @@ public class EditServiceImpl implements EditService {
         ));
     }
 
-    @Override
-    public Slice<NoticeDto> noticeProcess(Long lastId, int size) {
+//    @Override
+//    public Slice<NoticeDto> noticeProcess(Long lastId, int size) {
+//
+//        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+//
+//        List<Notice> notices = queryFactory
+//                .selectFrom(notice)
+//                .where(lastId != null ? notice.id.lt(lastId) : null)
+//                .orderBy(notice.id.desc())
+//                .limit(size+1)
+//                .fetch();
+//
+//        boolean hasNext = false;
+//        if(notices.size() > size){
+//            notices.remove(size);
+//            hasNext = true;
+//        }
+//        List<NoticeDto> noticeDtos = notices.stream()
+//                .map(notice -> new NoticeDto(
+//                        notice.getId(),
+//                        notice.getTitle(),
+//                        notice.getNoticeType(),
+//                        notice.getCreatedDate().toString()
+//                ))
+//                .collect(Collectors.toList());
+//
+//        return new SliceImpl<>(noticeDtos, PageRequest.of(0, size), hasNext);
+//
+//    }
 
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+    public void incrementViewCountWithWatch(Long noticeId) {
+        String key = NOTICE_VIEW_KEY + noticeId;
 
-        List<Notice> notices = queryFactory
-                .selectFrom(notice)
-                .where(lastId != null ? notice.id.lt(lastId) : null)
-                .orderBy(notice.id.desc())
-                .limit(size+1)
-                .fetch();
+        int maxRetries = 5;
+        for (int i = 0; i < maxRetries; i++) {
+            Boolean success = redisTemplate.execute(new SessionCallback<Boolean>() {
+                @Override
+                public Boolean execute(RedisOperations operations) {
+                    operations.watch(key);
 
-        boolean hasNext = false;
-        if(notices.size() > size){
-            notices.remove(size);
-            hasNext = true;
+                    String currentValue = (String) operations.opsForValue().get(key);
+                    long count = (currentValue == null) ? 0 : Long.parseLong(currentValue);
+                    count++;
+
+                    operations.multi();
+                    operations.opsForValue().set(key, String.valueOf(count));
+                    operations.expire(key, Duration.ofDays(1)); // TTL 설정
+                    List<Object> execResult = operations.exec();
+
+                    return execResult != null && !execResult.isEmpty();
+                }
+            });
+
+            if (Boolean.TRUE.equals(success)) {
+                return;
+            }
+
+            try {
+                Thread.sleep(50); // 짧은 대기 후 재시도
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
-        List<NoticeDto> noticeDtos = notices.stream()
-                .map(notice -> new NoticeDto(
-                        notice.getId(),
-                        notice.getTitle(),
-                        notice.getNoticeType(),
-                        notice.getCreatedDate().toString()
-                ))
-                .collect(Collectors.toList());
 
-        return new SliceImpl<>(noticeDtos, PageRequest.of(0, size), hasNext);
-
+        throw new RuntimeException("조회수 증가 실패 (낙관락 실패)");
     }
 }

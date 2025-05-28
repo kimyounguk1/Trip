@@ -9,24 +9,29 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class CustomLogoutFilter extends GenericFilterBean {
 
     private final JWTUtil jwtUtil;
     private final TokenRepository tokenRepository;
+    private final RedisTemplate<String, String> redisTemplate;
 
-    public CustomLogoutFilter(JWTUtil jwtUtil, TokenRepository tokenRepository) {
+    public CustomLogoutFilter(JWTUtil jwtUtil, TokenRepository tokenRepository, RedisTemplate<String, String> redisTemplate) {
         this.jwtUtil = jwtUtil;
         this.tokenRepository = tokenRepository;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        log.info("로그아웃 진입");
         doFilter((HttpServletRequest) servletRequest, (HttpServletResponse) servletResponse, filterChain);
     }
 
@@ -73,6 +78,19 @@ public class CustomLogoutFilter extends GenericFilterBean {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
         tokenRepository.deleteByRefresh(refresh);
+
+        String authorization = request.getHeader("Authorization");
+
+        String token = authorization.split(" ")[1];
+
+        //만료 시간
+        Date expiration = jwtUtil.getExpiration(token);
+        long now = System.currentTimeMillis();
+        long expTime = expiration.getTime();
+        long diff = (expTime - now)/1000;
+
+        //redis에 블랙리스트 저장
+        redisTemplate.opsForValue().set("blackList:"+token, "logout", diff, TimeUnit.SECONDS);
 
         Cookie cookie = new Cookie("refresh", null);
         cookie.setMaxAge(0);

@@ -21,19 +21,25 @@ public class EditController {
 
     private final EditService editService;
 
+//    @GetMapping("/notice")
+//    public ResponseEntity<ApiResponse<?>> noticePage(@PageableDefault(size = 10)Pageable pageable) {
+//
+//        Page<NoticeDto> notice = editService.noticeProcess(pageable);
+//
+//        return ResponseEntity.ok(ApiResponse.success(notice));
+//    }
+
     @GetMapping("/notice")
-    public ResponseEntity<ApiResponse<?>> noticePage(@PageableDefault(size = 10)Pageable pageable) {
-
-        Page<NoticeDto> notice = editService.noticeProcess(pageable);
-
-        return ResponseEntity.ok(ApiResponse.success(notice));
+    public ResponseEntity<ApiResponse> notice() {
+        List<NoticeDto> noticeDtos = editService.noticeProcess();
+        return ResponseEntity.ok(ApiResponse.success(noticeDtos));
     }
-
-    @GetMapping("/slice")
-    public ResponseEntity<ApiResponse<?>> slicePage(  @RequestParam(required = false) Long lastId,  // 첫 번째 요청 시에는 null, 이후에는 마지막 항목 ID
-                                                      @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(ApiResponse.success(editService.noticeProcess(lastId, size)));
-    }
+//
+//    @GetMapping("/slice")
+//    public ResponseEntity<ApiResponse<?>> slicePage(  @RequestParam(required = false) Long lastId,  // 첫 번째 요청 시에는 null, 이후에는 마지막 항목 ID
+//                                                      @RequestParam(defaultValue = "10") int size) {
+//        return ResponseEntity.ok(ApiResponse.success(editService.noticeProcess(lastId, size)));
+//    }
 
     @GetMapping("/notice/{noticeId}")
     public ResponseEntity<ApiResponse<?>> noticeDtPage(@PathVariable("noticeId") Long noticeId){
