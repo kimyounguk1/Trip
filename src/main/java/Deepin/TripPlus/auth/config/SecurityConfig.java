@@ -1,9 +1,7 @@
 package Deepin.TripPlus.auth.config;
 
-import Deepin.TripPlus.auth.jwt.CustomLogoutFilter;
-import Deepin.TripPlus.auth.jwt.JWTFilter;
-import Deepin.TripPlus.auth.jwt.JWTUtil;
-import Deepin.TripPlus.auth.jwt.LoginFilter;
+import Deepin.TripPlus.auth.jwt.*;
+import Deepin.TripPlus.auth.service.CustomOAuth2UserService;
 import Deepin.TripPlus.redis.repository.TokenRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,13 +24,18 @@ public class SecurityConfig {
     private final JWTUtil jwtUtil;
     private final TokenRepository tokenRepository;
     private final RedisTemplate<String, String> redisTemplate;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    // private final CustomSuccessHandler customSuccessHandler; // <-- 이제 생성자에서 주입받을 필요 없음
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, TokenRepository tokenRepository, RedisTemplate<String, String> redisTemplate) {
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, TokenRepository tokenRepository, RedisTemplate<String, String> redisTemplate, CustomOAuth2UserService customOAuth2UserService) { // <-- 생성자 파라미터에서 CustomSuccessHandler 제거
         this.jwtUtil = jwtUtil;
         this.authenticationConfiguration = authenticationConfiguration;
         this.tokenRepository = tokenRepository;
         this.redisTemplate = redisTemplate;
+        this.customOAuth2UserService = customOAuth2UserService;
+        // this.customSuccessHandler = customSuccessHandler; // <-- 제거
     }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
@@ -41,6 +44,12 @@ public class SecurityConfig {
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    // CustomSuccessHandler를 빈으로 등록하는 Bean 메서드 추가
+    @Bean
+    public CustomSuccessHandler customSuccessHandler(JWTUtil jwtUtil) { // JWTUtil은 Spring이 이미 빈으로 가지고 있을 것이므로 주입받음
+        return new CustomSuccessHandler(jwtUtil);
     }
 
     @Bean
@@ -58,11 +67,13 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth)-> auth
                         .requestMatchers(
+                                "/actuator/**",
                                 "/auth/**", "/login",
                                 "/v3/api-docs/**",     // Swagger JSON 문서 경로
                                 "/swagger-ui/**",      // Swagger UI 리소스 경로
                                 "/swagger-ui.html",     // Swagger HTML 진입점
                                 "/course/**",
+                                "/error/**",
                                 "/admin/register",
                                 "/reissue"
                         ).permitAll()
@@ -78,6 +89,12 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http
                 .addFilterBefore(new CustomLogoutFilter(jwtUtil, tokenRepository, redisTemplate), LoginFilter.class);
+        http
+                .oauth2Login((oauth2) -> oauth2
+                        .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
+                                .userService(customOAuth2UserService))
+                        .successHandler(customSuccessHandler(jwtUtil)) // <-- 여기서 직접 생성한 빈을 사용
+                );
 
 
         return http.build();

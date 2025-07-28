@@ -218,6 +218,7 @@ public class EditServiceImpl implements EditService {
         for (int i = 0; i < maxRetries; i++) {
             Boolean success = redisTemplate.execute(new SessionCallback<Boolean>() {
                 @Override
+                @SuppressWarnings("unchecked")
                 public Boolean execute(RedisOperations operations) {
                     operations.watch(key);
 

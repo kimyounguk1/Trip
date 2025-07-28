@@ -50,6 +50,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         try {
             loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
         } catch (IOException e) {
+            System.out.println("여기서 실패1");
             throw new RuntimeException(e);
         }
 
@@ -95,6 +96,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
         // 실패 시 처리 로직 (필요시 커스텀)
+        System.out.println("여기서 실패2");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
