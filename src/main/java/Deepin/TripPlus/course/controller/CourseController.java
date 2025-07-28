@@ -1,8 +1,12 @@
 package Deepin.TripPlus.course.controller;
 
 import Deepin.TripPlus.auth.dto.CourseDto;
+import Deepin.TripPlus.course.dto.ContentDto;
+import Deepin.TripPlus.course.dto.ContentInput;
 import Deepin.TripPlus.course.service.CourseService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,8 +32,14 @@ public class CourseController {
     }
 
     @PostMapping("/survey")
-    public String courseSurveyProcess(){
-        return "Course Survey";
+    public ResponseEntity<List<ContentDto>> courseSurveyProcess(@RequestBody ContentInput input){
+        try{
+            List<ContentDto> result = courseService.getRecommendations(input);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
     }
 
     @PostMapping("/save")
