@@ -42,8 +42,11 @@
   architecture
 </h1>
 개선전 구조
+<br>
 <img width="716" height="496" alt="image" src="https://github.com/user-attachments/assets/32787b6d-566b-4c9e-a933-572f28b601bf" />
+<br>
 개선후 구조
+<br>
 <img width="662" height="438" alt="image" src="https://github.com/user-attachments/assets/b8a4338d-d84b-4fbc-a984-c31710920b67" />
 <h1>PROBLEM-SOLVING</h1>
 1. JWT 토큰의 보안 문제
