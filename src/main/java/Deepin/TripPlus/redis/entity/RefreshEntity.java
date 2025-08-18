@@ -10,7 +10,7 @@ import org.springframework.data.redis.core.TimeToLive;
 @Getter @Setter
 @AllArgsConstructor
 @RedisHash(value = "refresh")
-public class RefreshEntity {
+public class RefreshEntity{
 
     @Id
     private String username;
