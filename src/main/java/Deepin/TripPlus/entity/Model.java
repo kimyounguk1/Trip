@@ -1,0 +1,53 @@
+package Deepin.TripPlus.entity;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
+import java.util.Date;
+
+@Table(name = "Model")
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+@Getter
+@Setter
+public class Model {
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "MODEL_ID")
+    private Long id;
+
+    @Column(name = "NAME")
+    private String name;
+
+    @Column(name = "MODEL_TYPE")
+    private String modelType;
+
+    @Column(name = "NESTIMATORS")
+    private Integer nEstimators;
+
+    @Column(name = "LEARNINGRATE")
+    private Double learningRate;
+
+    @Column(name = "MAXDEPTH")
+    private Integer maxDepth;
+
+    @Column(name = "MINSAMPLESSPLIT")
+    private Integer minSamplesSplit;
+
+    @Column(name = "INFORMATION", columnDefinition = "TEXT")
+    private String information;
+
+    @Column(name = "APPLY_DATE")
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime applyDate;
+
+    @Column(name = "CREATE_DATE")
+    @CreatedDate
+    private LocalDateTime createdDate;
+
+
+}
