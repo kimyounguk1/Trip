@@ -44,9 +44,6 @@ public class RatingServiceImpl implements RatingService {
         rating.setScore(score);
         rating.setModelName(modelName);
 
-        course.addRating(rating);
-        user.addRating(rating);
-
         ratingRepository.save(rating);
 
         return rating;

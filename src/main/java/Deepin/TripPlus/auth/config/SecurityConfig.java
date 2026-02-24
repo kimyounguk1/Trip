@@ -15,6 +15,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -26,14 +31,16 @@ public class SecurityConfig {
     private final RedisTemplate<String, String> redisTemplate;
     private final CustomOAuth2UserService customOAuth2UserService;
     // private final CustomSuccessHandler customSuccessHandler; // <-- 이제 생성자에서 주입받을 필요 없음
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, TokenRepository tokenRepository, RedisTemplate<String, String> redisTemplate, CustomOAuth2UserService customOAuth2UserService) { // <-- 생성자 파라미터에서 CustomSuccessHandler 제거
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, TokenRepository tokenRepository, RedisTemplate<String, String> redisTemplate, CustomOAuth2UserService customOAuth2UserService, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) { // <-- 생성자 파라미터에서 CustomSuccessHandler 제거
         this.jwtUtil = jwtUtil;
         this.authenticationConfiguration = authenticationConfiguration;
         this.tokenRepository = tokenRepository;
         this.redisTemplate = redisTemplate;
         this.customOAuth2UserService = customOAuth2UserService;
         // this.customSuccessHandler = customSuccessHandler; // <-- 제거
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
     }
 
     @Bean
@@ -58,6 +65,12 @@ public class SecurityConfig {
         LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, tokenRepository);
         loginFilter.setFilterProcessesUrl("/auth/login"); // 로그인 경로 변경!
 
+        http
+                .headers(headers -> headers
+                        .contentSecurityPolicy(csp -> csp
+                                .policyDirectives("default-src 'self';")
+                        )
+                );
         http
                 .csrf((auth)->auth.disable());
         http
@@ -95,8 +108,24 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService))
                         .successHandler(customSuccessHandler(jwtUtil)) // <-- 여기서 직접 생성한 빈을 사용
                 );
-
+        http
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                );
 
         return http.build();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        configuration.setAllowedMethods(Arrays.asList("*"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true); //자격증명허용
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); //모든 url에 대해 접속 허용
+        return source;
     }
 }

@@ -54,32 +54,16 @@ public class User {
     @CreatedDate
     private LocalDateTime createdDate;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "users")
+    @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, mappedBy = "users")
     private List<Course> courses = new ArrayList<>();
 
-    public void addCourse(Course course) {
-        courses.add(course);
-        course.setUsers(this);
-    }
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "users")
+    @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, mappedBy = "users")
     private List<Inquire> inquires = new ArrayList<>();
 
-    public void addInquire(Inquire inquire) {
-        inquires.add(inquire);
-        inquire.setUsers(this);
-    }
 
-    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Rating> ratings = new ArrayList<>();
-
-    public void addRating(Rating rating) {
-        ratings.add(rating);
-        rating.setUsers(this);
-    }
-
-
-
 
 
 

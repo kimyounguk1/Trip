@@ -113,7 +113,6 @@ public class EditServiceImpl implements EditService {
             inquire.setContent(submitDto.getContent());
             inquire.setAnswered(false);
 
-            user.addInquire(inquire);
 
         inquireRepository.save(inquire);
 
